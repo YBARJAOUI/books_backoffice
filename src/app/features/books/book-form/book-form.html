@@ -1,1 +1,305 @@
-<p>book-form works!</p>
+<!-- src/app/features/books/book-form/book-form.html -->
+<div class="book-form-container">
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-header">
+      <i class="pi pi-book me-2"></i>
+      {{ isEditMode ? 'Modifier le Livre' : 'Nouveau Livre' }}
+    </h2>
+    <button 
+      class="btn btn-outline-secondary"
+      (click)="onCancel()"
+      type="button">
+      <i class="pi pi-times me-2"></i>
+      Annuler
+    </button>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="custom-card" *ngIf="!loading">
+    <form [formGroup]="bookForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="card-body">
+        <!-- Informations de base -->
+        <div class="form-section">
+          <h5 class="section-title">
+            <i class="pi pi-info-circle me-2"></i>
+            Informations de base
+          </h5>
+          
+          <div class="row">
+            <!-- ISBN -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label required">ISBN</label>
+              <div class="input-group">
+                <input 
+                  type="text" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('isbn')"
+                  formControlName="isbn"
+                  placeholder="978-X-XXX-XXXXX-X">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  (click)="generateISBN()"
+                  title="Générer un ISBN">
+                  <i class="pi pi-refresh"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('isbn')">
+                {{ getFieldError('isbn') }}
+              </div>
+            </div>
+
+            <!-- Titre -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label required">Titre</label>
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('title')"
+                formControlName="title"
+                placeholder="Titre du livre">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('title')">
+                {{ getFieldError('title') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Auteur -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label required">Auteur</label>
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('author')"
+                formControlName="author"
+                placeholder="Nom de l'auteur">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('author')">
+                {{ getFieldError('author') }}
+              </div>
+            </div>
+
+            <!-- Catégorie -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Catégorie</label>
+              <select 
+                class="form-select"
+                formControlName="category">
+                <option value="">Sélectionner une catégorie</option>
+                <option *ngFor="let category of categoryOptions" [value]="category">
+                  {{ category }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea 
+              class="form-control"
+              formControlName="description"
+              rows="4"
+              placeholder="Description du livre"></textarea>
+          </div>
+        </div>
+
+        <!-- Informations commerciales -->
+        <div class="form-section">
+          <h5 class="section-title">
+            <i class="pi pi-dollar me-2"></i>
+            Informations commerciales
+          </h5>
+          
+          <div class="row">
+            <!-- Prix -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label required">Prix (€)</label>
+              <input 
+                type="number" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('price')"
+                formControlName="price"
+                step="0.01"
+                min="0"
+                placeholder="0.00">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('price')">
+                {{ getFieldError('price') }}
+              </div>
+            </div>
+
+            <!-- Stock -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label required">Quantité en stock</label>
+              <input 
+                type="number" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('stockQuantity')"
+                formControlName="stockQuantity"
+                min="0"
+                placeholder="0">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('stockQuantity')">
+                {{ getFieldError('stockQuantity') }}
+              </div>
+            </div>
+
+            <!-- Éditeur -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Éditeur</label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="publisher"
+                placeholder="Nom de l'éditeur">
+            </div>
+          </div>
+        </div>
+
+        <!-- Détails du livre -->
+        <div class="form-section">
+          <h5 class="section-title">
+            <i class="pi pi-file me-2"></i>
+            Détails du livre
+          </h5>
+          
+          <div class="row">
+            <!-- Année de publication -->
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Année de publication</label>
+              <input 
+                type="number" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('publicationYear')"
+                formControlName="publicationYear"
+                [min]="getMinYear()"
+                [max]="getCurrentYear()"
+                placeholder="2024">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('publicationYear')">
+                {{ getFieldError('publicationYear') }}
+              </div>
+            </div>
+
+            <!-- Langue -->
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Langue</label>
+              <select 
+                class="form-select"
+                formControlName="language">
+                <option *ngFor="let lang of languageOptions" [value]="lang.value">
+                  {{ lang.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Nombre de pages -->
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Nombre de pages</label>
+              <input 
+                type="number" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('pageCount')"
+                formControlName="pageCount"
+                min="1"
+                placeholder="0">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('pageCount')">
+                {{ getFieldError('pageCount') }}
+              </div>
+            </div>
+
+            <!-- Image URL -->
+            <div class="col-md-3 mb-3">
+              <label class="form-label">URL de l'image</label>
+              <input 
+                type="url" 
+                class="form-control"
+                formControlName="imageUrl"
+                placeholder="https://...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="form-section">
+          <h5 class="section-title">
+            <i class="pi pi-cog me-2"></i>
+            Options
+          </h5>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  formControlName="isActive"
+                  id="isActive">
+                <label class="form-check-label" for="isActive">
+                  Livre actif
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  formControlName="isFeatured"
+                  id="isFeatured">
+                <label class="form-check-label" for="isFeatured">
+                  Livre en vedette
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-footer d-flex justify-content-between">
+        <div>
+          <button 
+            class="btn btn-secondary me-2"
+            type="button"
+            (click)="onReset()"
+            [disabled]="submitLoading">
+            <i class="pi pi-refresh me-2"></i>
+            Réinitialiser
+          </button>
+        </div>
+        
+        <div>
+          <button 
+            class="btn btn-outline-secondary me-2"
+            type="button"
+            (click)="onCancel()"
+            [disabled]="submitLoading">
+            <i class="pi pi-times me-2"></i>
+            Annuler
+          </button>
+          
+          <button 
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="bookForm.invalid || submitLoading">
+            <i class="pi pi-spin pi-spinner me-2" *ngIf="submitLoading"></i>
+            <i class="pi pi-check me-2" *ngIf="!submitLoading"></i>
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading -->
+  <div class="custom-card text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3">Chargement du livre...</p>
+  </div>
+</div>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>

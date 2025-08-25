@@ -8,6 +8,18 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
 
+// PrimeNG Modules
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { DropdownModule } from 'primeng/dropdown';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BadgeModule } from 'primeng/badge';
+import { TagModule } from 'primeng/tag';
+import { MessageService, ConfirmationService } from 'primeng/api';
+
 // Application Components
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
@@ -56,13 +68,31 @@ import { CustomerListComponent } from './features/customers/customers.component'
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
+    
+    // PrimeNG Modules
+    TableModule,
+    ButtonModule,
+    InputTextModule,
+    DropdownModule,
+    ToastModule,
+    ConfirmDialogModule,
+    ProgressSpinnerModule,
+    BadgeModule,
+    TagModule,
+    
+    // Toastr
     ToastrModule.forRoot({
       timeOut: 3000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
+      progressBar: true,
+      closeButton: true
     })
   ],
-  providers: [],
+  providers: [
+    MessageService,
+    ConfirmationService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

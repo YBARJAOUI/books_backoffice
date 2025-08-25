@@ -1,0 +1,283 @@
+// src/app/features/books/book-detail/book-detail.scss
+.book-detail-container {
+  .page-header {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+
+    i {
+      color: #667eea;
+    }
+  }
+
+  .custom-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px 10px 0 0;
+      padding: 1rem 1.5rem;
+      
+      h5 {
+        margin: 0;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Image du livre
+  .book-image-large {
+    .book-cover {
+      max-width: 250px;
+      max-height: 350px;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .book-placeholder-large {
+      width: 250px;
+      height: 350px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      border: 2px dashed #dee2e6;
+
+      i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  // Labels et valeurs
+  .detail-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  .detail-value {
+    color: #6c757d;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+
+    &.price-display {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #28a745;
+    }
+
+    code {
+      background-color: #f8f9fa;
+      color: #495057;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    a {
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Badges personnalisés
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    font-weight: 500;
+    border-radius: 20px;
+
+    &.bg-success { 
+      background: linear-gradient(135deg, #28a745, #20c997) !important; 
+    }
+    &.bg-warning { 
+      background: linear-gradient(135deg, #ffc107, #fd7e14) !important; 
+      color: #212529 !important;
+    }
+    &.bg-danger { 
+      background: linear-gradient(135deg, #dc3545, #e83e8c) !important; 
+    }
+    &.bg-info { 
+      background: linear-gradient(135deg, #17a2b8, #6f42c1) !important; 
+    }
+    &.bg-secondary {
+      background: linear-gradient(135deg, #6c757d, #495057) !important;
+    }
+  }
+
+  // Boutons
+  .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &.btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+    }
+
+    &.btn-warning {
+      background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+      border: none;
+      color: #212529;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+      }
+    }
+
+    &.btn-outline-warning {
+      border-color: #ffc107;
+      color: #ffc107;
+
+      &:hover {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+        transform: translateY(-2px);
+      }
+    }
+
+    &.btn-outline-danger {
+      border-color: #dc3545;
+      color: #dc3545;
+
+      &:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        transform: translateY(-2px);
+      }
+    }
+
+    &.btn-outline-secondary {
+      border-color: #6c757d;
+      color: #6c757d;
+
+      &:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  // Loading spinner
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    .page-header {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .d-flex.justify-content-between {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch !important;
+    }
+
+    .book-image-large {
+      .book-cover {
+        max-width: 200px;
+        max-height: 280px;
+      }
+
+      .book-placeholder-large {
+        width: 200px;
+        height: 280px;
+
+        i {
+          font-size: 2.5rem;
+        }
+      }
+    }
+
+    .detail-value.price-display {
+      font-size: 1.25rem;
+    }
+
+    .custom-card .card-body {
+      padding: 1rem;
+    }
+
+    .d-grid .btn {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .book-image-large {
+      .book-cover {
+        max-width: 150px;
+        max-height: 210px;
+      }
+
+      .book-placeholder-large {
+        width: 150px;
+        height: 210px;
+
+        i {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+    }
+
+    .detail-value {
+      font-size: 0.875rem;
+    }
+  }
+}
