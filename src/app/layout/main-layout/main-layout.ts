@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-main-layout',
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss',
-  imports: [CommonModule, RouterOutlet]
+  styleUrls: ['./main-layout.scss']
 })
 export class MainLayoutComponent implements OnInit {
   sidebarCollapsed = false;

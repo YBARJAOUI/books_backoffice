@@ -1,30 +1,38 @@
+// src/app/core/services/customer.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiService } from './api.service';
 import { Customer } from '../models/customer.interface';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = `${environment.apiUrl}/customers`;
+  private readonly endpoint = 'customers';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   getActiveCustomers(): Observable<Customer[]> {
-    return this.http.get<Customer[]>(`${this.apiUrl}/active`);
+    return this.apiService.get<Customer[]>(`${this.endpoint}/active`);
   }
 
-  getCustomers(page: number = 0, size: number = 10): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`);
+  getAllCustomers(): Observable<Customer[]> {
+    return this.apiService.get<Customer[]>(this.endpoint);
   }
 
   getCustomerById(id: number): Observable<Customer> {
-    return this.http.get<Customer>(`${this.apiUrl}/${id}`);
+    return this.apiService.get<Customer>(`${this.endpoint}/${id}`);
   }
 
-  updateCustomer(id: number, customer: Partial<Customer>): Observable<Customer> {
-    return this.http.put<Customer>(`${this.apiUrl}/${id}`, customer);
+  createCustomer(customer: Customer): Observable<Customer> {
+    return this.apiService.post<Customer>(this.endpoint, customer);
+  }
+
+  updateCustomer(id: number, customer: Customer): Observable<Customer> {
+    return this.apiService.put<Customer>(`${this.endpoint}/${id}`, customer);
+  }
+
+  deleteCustomer(id: number): Observable<void> {
+    return this.apiService.delete<void>(`${this.endpoint}/${id}`);
   }
 }

@@ -60,7 +60,7 @@
             <i class="pi pi-dollar"></i>
           </div>
           <div class="stats-content">
-            <h3>{{ stats.totalRevenue | currency:'EUR' }}</h3>
+            <h3>{{ stats.totalRevenue | currency:'EUR':'symbol':'1.0-0' }}</h3>
             <p>Revenus</p>
           </div>
         </div>
@@ -86,45 +86,6 @@
           <div class="stats-content">
             <h3>{{ stats.lowStockBooks }}</h3>
             <p>Stock Bas</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="row mb-4">
-      <!-- Revenue Chart -->
-      <div class="col-lg-8 mb-4">
-        <div class="custom-card">
-          <div class="card-header">
-            <h5><i class="pi pi-chart-line me-2"></i>Évolution des Revenus</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas baseChart
-                [data]="revenueChartData"
-                [options]="chartOptions"
-                type="line">
-              </canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Orders Status Chart -->
-      <div class="col-lg-4 mb-4">
-        <div class="custom-card">
-          <div class="card-header">
-            <h5><i class="pi pi-chart-pie me-2"></i>Statut des Commandes</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas baseChart
-                [data]="ordersChartData"
-                [options]="chartOptions"
-                type="doughnut">
-              </canvas>
-            </div>
           </div>
         </div>
       </div>
@@ -162,7 +123,7 @@
                       {{ order.customer.firstName }} {{ order.customer.lastName }}
                     </td>
                     <td>
-                      <strong>{{ order.totalAmount | currency:'EUR' }}</strong>
+                      <strong>{{ order.totalAmount | currency:'EUR':'symbol':'1.0-0' }}</strong>
                     </td>
                     <td>
                       <span class="badge" [class]="getStatusBadgeClass(order.status)">
@@ -191,7 +152,7 @@
         <div class="custom-card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5><i class="pi pi-exclamation-triangle me-2"></i>Stock Faible</h5>
-            <a routerLink="/books" [queryParams]="{filter: 'low-stock'}" class="btn btn-sm btn-outline-light">
+            <a routerLink="/books" class="btn btn-sm btn-outline-light">
               Voir tout <i class="pi pi-arrow-right ms-1"></i>
             </a>
           </div>
@@ -203,8 +164,8 @@
                 <small class="text-muted">{{ book.author }}</small>
               </div>
               <div class="stock-info">
-                <span class="badge badge-warning">
-                  {{ book.stockQuantity }} restant{{ book.stockQuantity > 1 ? 's' : '' }}
+                <span class="badge bg-warning text-dark">
+                  {{ book.stockQuantity }} restant{{ book.stockQuantity! > 1 ? 's' : '' }}
                 </span>
               </div>
             </div>
@@ -234,19 +195,19 @@
                 </a>
               </div>
               <div class="col-md-3 col-sm-6 mb-3">
-                <a routerLink="/packs/new" class="quick-action-btn">
-                  <i class="pi pi-box"></i>
-                  <span>Nouveau Pack</span>
+                <a routerLink="/books" class="quick-action-btn">
+                  <i class="pi pi-book"></i>
+                  <span>Gérer Livres</span>
                 </a>
               </div>
               <div class="col-md-3 col-sm-6 mb-3">
-                <a routerLink="/daily-offers/new" class="quick-action-btn">
-                  <i class="pi pi-star"></i>
-                  <span>Nouvelle Offre</span>
+                <a routerLink="/customers" class="quick-action-btn">
+                  <i class="pi pi-users"></i>
+                  <span>Voir Clients</span>
                 </a>
               </div>
               <div class="col-md-3 col-sm-6 mb-3">
-                <a routerLink="/orders" [queryParams]="{status: 'PENDING'}" class="quick-action-btn">
+                <a routerLink="/orders" class="quick-action-btn">
                   <i class="pi pi-eye"></i>
                   <span>Voir Commandes</span>
                 </a>

@@ -13,7 +13,12 @@
       "Bash(npm ls:*)",
       "Bash(ng build)",
       "Bash(curl:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

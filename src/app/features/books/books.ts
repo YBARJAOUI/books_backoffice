@@ -2,9 +2,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-books',
-  imports: [],
   templateUrl: './books.html',
-  styleUrl: './books.scss'
+  styleUrls: ['./books.scss']
 })
 export class Books {
 

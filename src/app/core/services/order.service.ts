@@ -1,30 +1,38 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiService } from './api.service';
 import { Order } from '../models/order.interface';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = `${environment.apiUrl}/orders`;
+  private readonly endpoint = 'orders';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   getRecentOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/recent`);
+    return this.apiService.get<Order[]>(`${this.endpoint}?size=10`);
   }
 
-  getOrders(page: number = 0, size: number = 10): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`);
+  getAllOrders(): Observable<Order[]> {
+    return this.apiService.get<Order[]>(this.endpoint);
   }
 
   getOrderById(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
+    return this.apiService.get<Order>(`${this.endpoint}/${id}`);
+  }
+
+  createOrder(order: any): Observable<Order> {
+    return this.apiService.post<Order>(this.endpoint, order);
   }
 
   updateOrderStatus(id: number, status: string): Observable<Order> {
-    return this.http.patch<Order>(`${this.apiUrl}/${id}/status`, { status });
+    return this.apiService.put<Order>(`${this.endpoint}/${id}/status?status=${status}`, {});
+  }
+
+  cancelOrder(id: number, reason?: string): Observable<Order> {
+    const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
+    return this.apiService.put<Order>(`${this.endpoint}/${id}/cancel${params}`, {});
   }
 }

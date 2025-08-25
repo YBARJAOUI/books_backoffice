@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout';
-import { DashboardComponent } from './features/dashboard/dashboard';
-import { BookListComponent } from './features/books/book-list/book-list';
-import { BookFormComponent } from './features/books/book-form/book-form';
-import { CustomersComponent } from './features/customers/customers';
-import { OrderListComponent } from './features/orders/order-list/order-list';
-import { OrderDetailComponent } from './features/orders/order-detail/order-detail';
-import { PacksComponent } from './features/packs/packs';
-import { DailyOffersComponent } from './features/daily-offers/daily-offers';
+import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { BookListComponent } from './features/books/book-list/book-list.component';
+import { BookFormComponent } from './features/books/book-form/book-form.component';
+import { CustomerListComponent } from './features/customers/customers.component';
+import { OrderListComponent } from './features/orders/order-list/order-list.component';
+import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component';
+import { PackListComponent } from './features/packs/pack-list/pack-list.component';
+import { DailyOfferListComponent } from './features/daily-offers/daily-offer-list/daily-offer-list.component';
 
 export const routes: Routes = [
   {
@@ -23,17 +23,17 @@ export const routes: Routes = [
       { path: 'books/edit/:id', component: BookFormComponent },
       
       // Routes des clients
-      { path: 'customers', component: CustomersComponent },
+      { path: 'customers', component: CustomerListComponent },
       
       // Routes des commandes
       { path: 'orders', component: OrderListComponent },
       { path: 'orders/:id', component: OrderDetailComponent },
       
       // Routes des packs
-      { path: 'packs', component: PacksComponent },
+      { path: 'packs', component: PackListComponent },
       
       // Routes des offres du jour
-      { path: 'daily-offers', component: DailyOffersComponent },
+      { path: 'daily-offers', component: DailyOfferListComponent },
       
       // Route de redirection pour les routes inconnues
       { path: '**', redirectTo: '/dashboard' }

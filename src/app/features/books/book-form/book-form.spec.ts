@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BookForm } from './book-form';
+import { BookForm } from './book-form.component';
 
 describe('BookForm', () => {
   let component: BookForm;
