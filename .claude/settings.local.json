@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Read(/C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend/**)",
+      "Bash(mv:*)",
+      "Read(/C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\controller/**)",
+      "Read(/C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\controller/**)",
+      "Read(/C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\entity/**)",
+      "Read(/C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\entity/**)",
+      "Bash(npm start)",
+      "Bash(ng serve:*)",
+      "Bash(npm ls:*)",
+      "Bash(ng build)",
+      "Bash(curl:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

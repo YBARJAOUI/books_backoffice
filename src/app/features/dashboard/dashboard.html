@@ -1,0 +1,260 @@
+<!-- src/app/features/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="page-header">
+        <i class="pi pi-chart-line me-2"></i>
+        Tableau de Bord
+      </h2>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading">
+    <!-- Statistics Cards Row -->
+    <div class="row mb-4">
+      <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stats-card books">
+          <div class="stats-icon">
+            <i class="pi pi-book"></i>
+          </div>
+          <div class="stats-content">
+            <h3>{{ stats.totalBooks }}</h3>
+            <p>Livres Total</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stats-card customers">
+          <div class="stats-icon">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="stats-content">
+            <h3>{{ stats.totalCustomers }}</h3>
+            <p>Clients</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stats-card orders">
+          <div class="stats-icon">
+            <i class="pi pi-shopping-cart"></i>
+          </div>
+          <div class="stats-content">
+            <h3>{{ stats.totalOrders }}</h3>
+            <p>Commandes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stats-card revenue">
+          <div class="stats-icon">
+            <i class="pi pi-dollar"></i>
+          </div>
+          <div class="stats-content">
+            <h3>{{ stats.totalRevenue | currency:'EUR' }}</h3>
+            <p>Revenus</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stats-card pending">
+          <div class="stats-icon">
+            <i class="pi pi-clock"></i>
+          </div>
+          <div class="stats-content">
+            <h3>{{ stats.pendingOrders }}</h3>
+            <p>En Attente</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stats-card warning">
+          <div class="stats-icon">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+          <div class="stats-content">
+            <h3>{{ stats.lowStockBooks }}</h3>
+            <p>Stock Bas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <!-- Revenue Chart -->
+      <div class="col-lg-8 mb-4">
+        <div class="custom-card">
+          <div class="card-header">
+            <h5><i class="pi pi-chart-line me-2"></i>Évolution des Revenus</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas baseChart
+                [data]="revenueChartData"
+                [options]="chartOptions"
+                type="line">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Status Chart -->
+      <div class="col-lg-4 mb-4">
+        <div class="custom-card">
+          <div class="card-header">
+            <h5><i class="pi pi-chart-pie me-2"></i>Statut des Commandes</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas baseChart
+                [data]="ordersChartData"
+                [options]="chartOptions"
+                type="doughnut">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Tables Row -->
+    <div class="row">
+      <!-- Recent Orders -->
+      <div class="col-lg-7 mb-4">
+        <div class="custom-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="pi pi-list me-2"></i>Commandes Récentes</h5>
+            <a routerLink="/orders" class="btn btn-sm btn-outline-light">
+              Voir tout <i class="pi pi-arrow-right ms-1"></i>
+            </a>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>N° Commande</th>
+                    <th>Client</th>
+                    <th>Total</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let order of recentOrders">
+                    <td>
+                      <strong>{{ order.orderNumber }}</strong>
+                    </td>
+                    <td>
+                      {{ order.customer.firstName }} {{ order.customer.lastName }}
+                    </td>
+                    <td>
+                      <strong>{{ order.totalAmount | currency:'EUR' }}</strong>
+                    </td>
+                    <td>
+                      <span class="badge" [class]="getStatusBadgeClass(order.status)">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <small>{{ order.createdAt | date:'short' }}</small>
+                    </td>
+                  </tr>
+                  <tr *ngIf="recentOrders.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">
+                      <i class="pi pi-info-circle me-2"></i>
+                      Aucune commande récente
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock Books -->
+      <div class="col-lg-5 mb-4">
+        <div class="custom-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="pi pi-exclamation-triangle me-2"></i>Stock Faible</h5>
+            <a routerLink="/books" [queryParams]="{filter: 'low-stock'}" class="btn btn-sm btn-outline-light">
+              Voir tout <i class="pi pi-arrow-right ms-1"></i>
+            </a>
+          </div>
+          <div class="card-body">
+            <div *ngFor="let book of lowStockBooks" class="low-stock-item d-flex justify-content-between align-items-center mb-3">
+              <div class="book-info">
+                <strong class="book-title">{{ book.title }}</strong>
+                <br>
+                <small class="text-muted">{{ book.author }}</small>
+              </div>
+              <div class="stock-info">
+                <span class="badge badge-warning">
+                  {{ book.stockQuantity }} restant{{ book.stockQuantity > 1 ? 's' : '' }}
+                </span>
+              </div>
+            </div>
+            
+            <div *ngIf="lowStockBooks.length === 0" class="text-center text-muted py-3">
+              <i class="pi pi-check-circle me-2 text-success"></i>
+              Tous les stocks sont OK
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+      <div class="col-12">
+        <div class="custom-card">
+          <div class="card-header">
+            <h5><i class="pi pi-cog me-2"></i>Actions Rapides</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 col-sm-6 mb-3">
+                <a routerLink="/books/new" class="quick-action-btn">
+                  <i class="pi pi-plus-circle"></i>
+                  <span>Nouveau Livre</span>
+                </a>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <a routerLink="/packs/new" class="quick-action-btn">
+                  <i class="pi pi-box"></i>
+                  <span>Nouveau Pack</span>
+                </a>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <a routerLink="/daily-offers/new" class="quick-action-btn">
+                  <i class="pi pi-star"></i>
+                  <span>Nouvelle Offre</span>
+                </a>
+              </div>
+              <div class="col-md-3 col-sm-6 mb-3">
+                <a routerLink="/orders" [queryParams]="{status: 'PENDING'}" class="quick-action-btn">
+                  <i class="pi pi-eye"></i>
+                  <span>Voir Commandes</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

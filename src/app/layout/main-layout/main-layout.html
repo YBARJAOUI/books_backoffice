@@ -1,0 +1,97 @@
+<!-- src/app/layout/main-layout/main-layout.component.html -->
+<div class="layout-wrapper" [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Sidebar -->
+  <nav class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="pi pi-book" *ngIf="sidebarCollapsed"></i>
+        <span *ngIf="!sidebarCollapsed">📚 BookStore BO</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-menu">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-chart-line"></i>
+            <span *ngIf="!sidebarCollapsed">Dashboard</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a routerLink="/books" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-book"></i>
+            <span *ngIf="!sidebarCollapsed">Livres</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a routerLink="/customers" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-users"></i>
+            <span *ngIf="!sidebarCollapsed">Clients</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a routerLink="/orders" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-shopping-cart"></i>
+            <span *ngIf="!sidebarCollapsed">Commandes</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a routerLink="/packs" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-box"></i>
+            <span *ngIf="!sidebarCollapsed">Packs</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a routerLink="/daily-offers" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-star-fill"></i>
+            <span *ngIf="!sidebarCollapsed">Offres du Jour</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button 
+          class="btn btn-link sidebar-toggle"
+          (click)="toggleSidebar()"
+          type="button">
+          <i class="pi pi-bars"></i>
+        </button>
+        <h1 class="page-title">Back Office</h1>
+      </div>
+      
+      <div class="header-right">
+        <div class="user-info">
+          <div class="avatar">
+            <i class="pi pi-user"></i>
+          </div>
+          <span class="username">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      <div class="container-fluid">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Mobile Overlay -->
+  <div 
+    class="mobile-overlay"
+    *ngIf="isMobile && !sidebarCollapsed"
+    (click)="toggleSidebar()">
+  </div>
+</div>
