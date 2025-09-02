@@ -1,0 +1,165 @@
+
+<div class="pack-list-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-header">
+      <i class="pi pi-box me-2"></i>
+      Pack Management
+    </h2>
+    <button class="btn btn-primary" (click)="showNewPackDialog()">
+      <i class="pi pi-plus me-2"></i>
+      New Pack
+    </button>
+  </div>
+
+  <!-- Packs Grid -->
+  <div class="row">
+    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let pack of packs">
+      <div class="custom-card pack-card">
+        <div class="card-header position-relative">
+          <img [src]="pack.imageUrl || 'assets/images/pack-placeholder.png'" 
+               class="card-img-top" 
+               [alt]="pack.name"
+               style="height: 200px; object-fit: cover;">
+          <div class="pack-badges position-absolute top-0 end-0 p-2">
+            <span class="badge bg-warning" *ngIf="pack.isFeatured">
+              <i class="pi pi-star-fill"></i> Featured
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ pack.name }}</h5>
+          <p class="card-text text-muted">{{ pack.description }}</p>
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <strong class="text-primary fs-5">{{ pack.price | currency:'EUR' }}</strong>
+            </div>
+            <div>
+              <span class="badge bg-{{ getStockClass(pack.stockQuantity!) }}">
+                Stock: {{ pack.stockQuantity }}
+              </span>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <small class="text-muted">
+              Category: <span class="badge bg-info">{{ pack.category || 'General' }}</span>
+            </small>
+          </div>
+
+          <div class="mb-2">
+            <small class="text-muted">
+              Status: 
+              <span class="badge" [class]="pack.isActive ? 'bg-success' : 'bg-danger'">
+                {{ pack.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </small>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-fill" (click)="editPack(pack)">
+              <i class="pi pi-pencil"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-warning" (click)="toggleFeatured(pack)">
+              <i class="pi pi-star"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="deletePack(pack)">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="col-12" *ngIf="packs.length === 0 && !loading">
+      <div class="custom-card text-center py-5">
+        <i class="pi pi-box empty-icon"></i>
+        <h5>No Packs Found</h5>
+        <p class="text-muted">Start by creating your first pack</p>
+        <button class="btn btn-primary" (click)="showNewPackDialog()">
+          <i class="pi pi-plus me-2"></i>
+          Create Pack
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2">Loading packs...</p>
+  </div>
+</div>
+
+<!-- Pack Dialog -->
+<div class="modal" [class.show]="showDialog" [style.display]="showDialog ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditMode ? 'Edit Pack' : 'New Pack' }}</h5>
+        <button type="button" class="btn-close" (click)="showDialog = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">Name</label>
+            <input type="text" class="form-control" [(ngModel)]="currentPack.name">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" [(ngModel)]="currentPack.category">
+              <option value="">Select Category</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" [(ngModel)]="currentPack.description" rows="3"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label required">Price (€)</label>
+            <input type="number" class="form-control" [(ngModel)]="currentPack.price" step="0.01" min="0">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Stock Quantity</label>
+            <input type="number" class="form-control" [(ngModel)]="currentPack.stockQuantity" min="0">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Image URL</label>
+            <input type="text" class="form-control" [(ngModel)]="currentPack.imageUrl">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="currentPack.isActive" id="isActive">
+              <label class="form-check-label" for="isActive">Active</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="currentPack.isFeatured" id="isFeatured">
+              <label class="form-check-label" for="isFeatured">Featured</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showDialog = false">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="savePack()">
+          {{ isEditMode ? 'Update' : 'Create' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= DAILY OFFER LIST TEMPLATE ============= -->
+<!-- src/app/features/daily-offers/daily-offer-list/daily-offer-list.component.html -->

@@ -19,7 +19,18 @@
       "Bash(git branch:*)",
       "Bash(npm install)",
       "Bash(npm install:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(npx tsc:*)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\entity/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\dto/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\config/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\controller/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend\\src\\main\\java\\com\\example\\book_store_backend\\service/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend/**)",
+      "Read(C:\\Users\\LENOVO\\Desktop\\younes\\projet\\website\\book_store_backend/**)"
     ],
     "deny": [],
     "ask": []

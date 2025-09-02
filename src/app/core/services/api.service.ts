@@ -35,9 +35,21 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  // POST FormData request
+  postFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, formData)
+      .pipe(catchError(this.handleError));
+  }
+
   // PUT request
   put<T>(endpoint: string, data: any): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}/${endpoint}`, data, this.getHttpOptions())
+      .pipe(catchError(this.handleError));
+  }
+
+  // PUT FormData request
+  putFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}/${endpoint}`, formData)
       .pipe(catchError(this.handleError));
   }
 

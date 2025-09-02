@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { Order } from '../models/order.interface';
+import { Order, OrderStatus, PaymentStatus } from '../models/order.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,6 @@ export class OrderService {
 
   constructor(private apiService: ApiService) {}
 
-  getRecentOrders(): Observable<Order[]> {
-    return this.apiService.get<Order[]>(`${this.endpoint}?size=10`);
-  }
-
   getAllOrders(): Observable<Order[]> {
     return this.apiService.get<Order[]>(this.endpoint);
   }
@@ -23,16 +19,28 @@ export class OrderService {
     return this.apiService.get<Order>(`${this.endpoint}/${id}`);
   }
 
-  createOrder(order: any): Observable<Order> {
-    return this.apiService.post<Order>(this.endpoint, order);
+  createOrder(orderData: any): Observable<Order> {
+    return this.apiService.post<Order>(this.endpoint, orderData);
   }
 
-  updateOrderStatus(id: number, status: string): Observable<Order> {
+  updateOrderStatus(id: number, status: OrderStatus): Observable<Order> {
     return this.apiService.put<Order>(`${this.endpoint}/${id}/status?status=${status}`, {});
   }
 
-  cancelOrder(id: number, reason?: string): Observable<Order> {
+  updatePaymentStatus(id: number, status: PaymentStatus): Observable<Order> {
+    return this.apiService.put<Order>(`${this.endpoint}/${id}/payment-status?paymentStatus=${status}`, {});
+  }
+
+  cancelOrder(id: number, reason?: string | null): Observable<Order> {
     const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
     return this.apiService.put<Order>(`${this.endpoint}/${id}/cancel${params}`, {});
+  }
+
+  getOrdersByStatus(status: OrderStatus): Observable<Order[]> {
+    return this.apiService.get<Order[]>(`${this.endpoint}/status/${status}`);
+  }
+
+  getCustomerOrders(customerId: number): Observable<Order[]> {
+    return this.apiService.get<Order[]>(`${this.endpoint}/customer/${customerId}`);
   }
 }

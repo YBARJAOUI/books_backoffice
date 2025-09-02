@@ -1,0 +1,182 @@
+<!-- ============= CUSTOMER LIST TEMPLATE ============= -->
+<!-- src/app/features/customers/customers.component.html -->
+
+<div class="customer-list-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-header">
+      <i class="pi pi-users me-2"></i>
+      Customer Management
+    </h2>
+    <button class="btn btn-primary" (click)="showNewCustomerDialog()">
+      <i class="pi pi-plus me-2"></i>
+      New Customer
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="custom-card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <input 
+              type="text" 
+              class="form-control"
+              placeholder="Search customers by name, email, or phone..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="searchCustomers()">
+            <button class="btn btn-outline-primary" (click)="searchCustomers()">
+              <i class="pi pi-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-outline-secondary" (click)="searchTerm=''; loadCustomers()">
+            <i class="pi pi-refresh me-2"></i>
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customers Table -->
+  <div class="custom-card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let customer of customers">
+              <td>
+                <strong>{{ customer.firstName }} {{ customer.lastName }}</strong>
+              </td>
+              <td>
+                <a href="mailto:{{ customer.email }}">{{ customer.email }}</a>
+              </td>
+              <td>{{ customer.phoneNumber }}</td>
+              <td>{{ customer.address }}</td>
+              <td>
+                {{ customer.city || '-' }}
+                <span class="text-muted" *ngIf="customer.country">
+                  , {{ customer.country }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-{{ getStatusClass(customer.isActive!) }}">
+                  {{ customer.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="editCustomer(customer)" title="Edit">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning" 
+                          (click)="toggleCustomerStatus(customer)" 
+                          [title]="customer.isActive ? 'Deactivate' : 'Activate'">
+                    <i class="pi" [class.pi-lock]="customer.isActive" [class.pi-unlock]="!customer.isActive"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteCustomer(customer)" title="Delete">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="customers.length === 0 && !loading">
+              <td colspan="7" class="text-center py-4">
+                <i class="pi pi-users empty-icon"></i>
+                <p>No customers found</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2">Loading customers...</p>
+  </div>
+</div>
+
+<!-- Customer Dialog -->
+<div class="modal" [class.show]="showDialog" [style.display]="showDialog ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditMode ? 'Edit Customer' : 'New Customer' }}</h5>
+        <button type="button" class="btn-close" (click)="showDialog = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">First Name</label>
+            <input type="text" class="form-control" [(ngModel)]="currentCustomer.firstName">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">Last Name</label>
+            <input type="text" class="form-control" [(ngModel)]="currentCustomer.lastName">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">Email</label>
+            <input type="email" class="form-control" [(ngModel)]="currentCustomer.email">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">Phone Number</label>
+            <input type="tel" class="form-control" [(ngModel)]="currentCustomer.phoneNumber" 
+                   placeholder="+33612345678">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label required">Address</label>
+          <input type="text" class="form-control" [(ngModel)]="currentCustomer.address">
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" [(ngModel)]="currentCustomer.city">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Postal Code</label>
+            <input type="text" class="form-control" [(ngModel)]="currentCustomer.postalCode">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control" [(ngModel)]="currentCustomer.country">
+          </div>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" [(ngModel)]="currentCustomer.isActive" id="customerActive">
+          <label class="form-check-label" for="customerActive">Active</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showDialog = false">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveCustomer()">
+          {{ isEditMode ? 'Update' : 'Create' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,250 @@
+<!-- ============= ORDER LIST TEMPLATE ============= -->
+<!-- src/app/features/orders/order-list/order-list.component.html -->
+
+<div class="order-list-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-header">
+      <i class="pi pi-shopping-cart me-2"></i>
+      Order Management
+    </h2>
+    <button class="btn btn-primary" (click)="showNewOrderDialog()">
+      <i class="pi pi-plus me-2"></i>
+      New Order
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="custom-card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Filter by Status</label>
+          <select class="form-select" [(ngModel)]="statusFilter" (change)="filterOrders()">
+            <option value="">All Status</option>
+            <option *ngFor="let status of orderStatuses" [value]="status">
+              {{ status }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-8 d-flex align-items-end">
+          <button class="btn btn-outline-secondary" (click)="statusFilter=''; loadOrders()">
+            <i class="pi pi-refresh me-2"></i>
+            Reset Filters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="custom-card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>
+                <strong>{{ order.orderNumber }}</strong>
+              </td>
+              <td>
+                {{ order.customer.firstName }} {{ order.customer.lastName }}
+                <br>
+                <small class="text-muted">{{ order.customer.email }}</small>
+              </td>
+              <td>
+                <strong>{{ order.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</strong>
+              </td>
+              <td>
+                <span class="badge bg-{{ getStatusClass(order.status) }}">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-{{ getPaymentStatusClass(order.paymentStatus) }}">
+                  {{ order.paymentStatus }}
+                </span>
+              </td>
+              <td>
+                {{ order.createdAt | date:'short' }}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="viewOrderDetails(order)" title="View Details">
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning" 
+                          *ngIf="order.status !== 'DELIVERED' && order.status !== 'CANCELLED'"
+                          (click)="updateOrderStatus(order, 'SHIPPED')" title="Mark as Shipped">
+                    <i class="pi pi-send"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" 
+                          *ngIf="order.status !== 'DELIVERED' && order.status !== 'CANCELLED'"
+                          (click)="cancelOrder(order)" title="Cancel Order">
+                    <i class="pi pi-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="orders.length === 0 && !loading">
+              <td colspan="7" class="text-center py-4">
+                <i class="pi pi-shopping-cart empty-icon"></i>
+                <p>No orders found</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2">Loading orders...</p>
+  </div>
+</div>
+
+<!-- Create Order Dialog -->
+<div class="modal" [class.show]="showCreateDialog" [style.display]="showCreateDialog ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Order</h5>
+        <button type="button" class="btn-close" (click)="showCreateDialog = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label required">Customer</label>
+          <select class="form-select" [(ngModel)]="newOrder.customerId">
+            <option [value]="null">Select Customer</option>
+            <option *ngFor="let customer of customers" [value]="customer.id">
+              {{ customer.firstName }} {{ customer.lastName }} - {{ customer.email }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label required">Books</label>
+          <div *ngFor="let item of selectedBooks; let i = index" class="d-flex gap-2 mb-2">
+            <select class="form-select flex-grow-1" [(ngModel)]="item.book">
+              <option [value]="null">Select Book</option>
+              <option *ngFor="let book of books" [ngValue]="book">
+                {{ book.title }} - {{ book.price | currency:'EUR' }} (Stock: {{ book.stockQuantity }})
+              </option>
+            </select>
+            <input type="number" class="form-control" style="width: 100px" 
+                   [(ngModel)]="item.quantity" min="1" placeholder="Qty">
+            <button class="btn btn-danger" (click)="removeBookFromOrder(i)">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+          <button class="btn btn-outline-primary btn-sm mt-2" (click)="addBookToOrder()">
+            <i class="pi pi-plus me-2"></i>Add Book
+          </button>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Shipping Address</label>
+          <textarea class="form-control" [(ngModel)]="newOrder.shippingAddress" rows="2"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" [(ngModel)]="newOrder.notes" rows="2"></textarea>
+        </div>
+
+        <div class="alert alert-info">
+          <strong>Total: {{ calculateOrderTotal() | currency:'EUR':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showCreateDialog = false">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="createOrder()">Create Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Dialog -->
+<div class="modal" [class.show]="showDetailDialog" [style.display]="showDetailDialog ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" *ngIf="selectedOrder">
+      <div class="modal-header">
+        <h5 class="modal-title">Order Details - {{ selectedOrder.orderNumber }}</h5>
+        <button type="button" class="btn-close" (click)="showDetailDialog = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <h6>Customer Information</h6>
+            <p>
+              <strong>{{ selectedOrder.customer.firstName }} {{ selectedOrder.customer.lastName }}</strong><br>
+              {{ selectedOrder.customer.email }}<br>
+              {{ selectedOrder.customer.phoneNumber }}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <h6>Order Information</h6>
+            <p>
+              Status: <span class="badge bg-{{ getStatusClass(selectedOrder.status) }}">{{ selectedOrder.status }}</span><br>
+              Payment: <span class="badge bg-{{ getPaymentStatusClass(selectedOrder.paymentStatus) }}">{{ selectedOrder.paymentStatus }}</span><br>
+              Date: {{ selectedOrder.createdAt | date:'medium' }}
+            </p>
+          </div>
+        </div>
+
+        <h6>Order Items</h6>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Book</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of selectedOrder.orderItems">
+              <td>{{ item.bookTitle }}<br><small class="text-muted">by {{ item.bookAuthor }}</small></td>
+              <td>{{ item.price | currency:'EUR' }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ (item.price * item.quantity) | currency:'EUR' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="3">Total</th>
+              <th>{{ selectedOrder.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</th>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div *ngIf="selectedOrder.shippingAddress">
+          <h6>Shipping Address</h6>
+          <p>{{ selectedOrder.shippingAddress }}</p>
+        </div>
+
+        <div *ngIf="selectedOrder.notes">
+          <h6>Notes</h6>
+          <p>{{ selectedOrder.notes }}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showDetailDialog = false">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+

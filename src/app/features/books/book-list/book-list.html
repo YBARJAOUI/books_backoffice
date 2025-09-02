@@ -18,7 +18,7 @@
   <div class="custom-card mb-4">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label class="form-label">Rechercher</label>
           <div class="input-group">
             <input 
@@ -37,19 +37,6 @@
         </div>
 
         <div class="col-md-3">
-          <label class="form-label">Catégorie</label>
-          <select 
-            class="form-select"
-            [(ngModel)]="selectedCategory"
-            (change)="onCategoryChange()">
-            <option value="">Toutes les catégories</option>
-            <option *ngFor="let category of categories" [value]="category">
-              {{ category }}
-            </option>
-          </select>
-        </div>
-
-        <div class="col-md-3">
           <button 
             class="btn btn-outline-secondary me-2"
             (click)="clearFilters()">
@@ -58,7 +45,7 @@
           </button>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-3">
           <button 
             class="btn btn-success"
             (click)="exportExcel()">
@@ -117,13 +104,11 @@
               Auteur <p-sortIcon field="author"></p-sortIcon>
             </th>
             <th>Catégorie</th>
+            <th>Langue</th>
             <th pSortableColumn="price">
               Prix <p-sortIcon field="price"></p-sortIcon>
             </th>
-            <th pSortableColumn="stockQuantity">
-              Stock <p-sortIcon field="stockQuantity"></p-sortIcon>
-            </th>
-            <th>Statut</th>
+            <th>Disponibilité</th>
             <th style="width: 200px">Actions</th>
           </tr>
         </ng-template>
@@ -134,16 +119,10 @@
             <td>
               <div class="book-image">
                 <img 
-                  *ngIf="book.imageUrl" 
-                  [src]="book.imageUrl" 
+                  [src]="book.imageBase64 || 'assets/images/book-placeholder.png'" 
                   [alt]="book.title"
                   class="book-thumbnail"
                   onerror="this.src='assets/images/book-placeholder.png'">
-                <div 
-                  *ngIf="!book.imageUrl" 
-                  class="book-placeholder">
-                  <i class="pi pi-image"></i>
-                </div>
               </div>
             </td>
             
@@ -152,11 +131,6 @@
                 <strong class="book-title">{{ book.title }}</strong>
                 <div class="book-meta">
                   <small class="text-muted">ISBN: {{ book.isbn }}</small>
-                  <span 
-                    *ngIf="book.isFeatured" 
-                    class="badge bg-warning ms-2">
-                    <i class="pi pi-star-fill me-1"></i>Vedette
-                  </span>
                 </div>
               </div>
             </td>
@@ -166,10 +140,11 @@
             </td>
             
             <td>
-              <span class="badge bg-info" *ngIf="book.category">
-                {{ book.category }}
-              </span>
-              <span class="text-muted" *ngIf="!book.category">-</span>
+              <span class="badge bg-info text-dark">{{ book.category }}</span>
+            </td>
+            
+            <td>
+              <span class="badge" [class]="getLanguageBadgeClass(book.language)">{{ getLanguageLabel(book.language) }}</span>
             </td>
             
             <td>
@@ -179,22 +154,8 @@
             <td>
               <span 
                 class="badge"
-                [class]="'bg-' + getStockSeverity(book.stockQuantity)">
-                {{ book.stockQuantity }}
-              </span>
-              <button 
-                *ngIf="book.stockQuantity <= 10"
-                class="btn btn-sm btn-link text-warning ms-1"
-                title="Stock faible">
-                <i class="pi pi-exclamation-triangle"></i>
-              </button>
-            </td>
-            
-            <td>
-              <span 
-                class="badge"
-                [class]="'bg-' + getStatusSeverity(book.isActive!)">
-                {{ book.isActive ? 'Actif' : 'Inactif' }}
+                [class]="'bg-' + getAvailabilitySeverity(book.isAvailable!)">
+                {{ book.isAvailable ? 'Disponible' : 'Indisponible' }}
               </span>
             </td>
             
@@ -209,10 +170,10 @@
                 
                 <button 
                   class="btn btn-sm"
-                  [class]="book.isFeatured ? 'btn-warning' : 'btn-outline-warning'"
-                  (click)="toggleFeatured(book)"
-                  [title]="book.isFeatured ? 'Retirer des favoris' : 'Ajouter aux favoris'">
-                  <i class="pi pi-star" [class.pi-star-fill]="book.isFeatured"></i>
+                  [class]="book.isAvailable ? 'btn-warning' : 'btn-success'"
+                  (click)="toggleAvailability(book)"
+                  [title]="book.isAvailable ? 'Marquer indisponible' : 'Marquer disponible'">
+                  <i class="pi" [class.pi-eye-slash]="book.isAvailable" [class.pi-eye]="!book.isAvailable"></i>
                 </button>
                 
                 <button 

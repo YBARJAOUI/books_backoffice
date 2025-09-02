@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookService } from '../../../core/services/book.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { ImageService } from '../../../core/services/image.service';
 import { Book } from '../../../core/models/book.interface';
 
 @Component({
@@ -18,15 +19,14 @@ export class BookFormComponent implements OnInit {
   loading = false;
   submitLoading = false;
   categories: string[] = [];
+  selectedImage: File | null = null;
+  imagePreview: string | null = null;
 
   // Options pour les listes déroulantes
   languageOptions = [
-    { label: 'Français', value: 'fr' },
-    { label: 'Anglais', value: 'en' },
-    { label: 'Espagnol', value: 'es' },
-    { label: 'Allemand', value: 'de' },
-    { label: 'Italien', value: 'it' },
-    { label: 'Autre', value: 'other' }
+    { label: 'Français', value: 'francais' },
+    { label: 'Anglais', value: 'anglais' },
+    { label: 'Arabe', value: 'arabe' }
   ];
 
   categoryOptions = [
@@ -51,6 +51,7 @@ export class BookFormComponent implements OnInit {
     private fb: FormBuilder,
     private bookService: BookService,
     private notificationService: NotificationService,
+    private imageService: ImageService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -69,15 +70,11 @@ export class BookFormComponent implements OnInit {
       author: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       description: [''],
       price: [0, [Validators.required, Validators.min(0.01)]],
-      stockQuantity: [0, [Validators.required, Validators.min(0)]],
-      category: [''],
-      publisher: [''],
-      publicationYear: [null, [Validators.min(1000), Validators.max(new Date().getFullYear())]],
-      language: ['fr'],
-      pageCount: [null, [Validators.min(1)]],
-      imageUrl: [''],
-      isActive: [true],
-      isFeatured: [false]
+      stock: [0, [Validators.required, Validators.min(0)]],
+      imageBase64: [''],
+      isAvailable: [true],
+      language: ['francais', [Validators.required]],
+      category: ['', [Validators.required]]
     });
   }
 
@@ -95,6 +92,9 @@ export class BookFormComponent implements OnInit {
     this.bookService.getBook(this.bookId!).subscribe({
       next: (book: Book) => {
         this.bookForm.patchValue(book);
+        if (book.imageBase64) {
+          this.imagePreview = book.imageBase64;
+        }
         this.loading = false;
       },
       error: (error) => {
@@ -117,10 +117,21 @@ export class BookFormComponent implements OnInit {
     });
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.bookForm.valid) {
       this.submitLoading = true;
       const bookData: Book = this.bookForm.value;
+
+      if (this.selectedImage) {
+        try {
+          bookData.imageBase64 = await this.imageService.convertToBase64(this.selectedImage);
+        } catch (error) {
+          console.error('Erreur lors de la conversion de l\'image:', error);
+          this.notificationService.error('Erreur lors de la conversion de l\'image');
+          this.submitLoading = false;
+          return;
+        }
+      }
 
       const operation = this.isEditMode 
         ? this.bookService.updateBook(this.bookId!, bookData)
@@ -154,12 +165,13 @@ export class BookFormComponent implements OnInit {
     } else {
       this.bookForm.reset();
       this.bookForm.patchValue({
-        isActive: true,
-        isFeatured: false,
-        language: 'fr',
+        isAvailable: true,
         price: 0,
-        stockQuantity: 0
+        stock: 0,
+        language: 'francais'
       });
+      this.selectedImage = null;
+      this.imagePreview = null;
     }
   }
 
@@ -191,13 +203,10 @@ export class BookFormComponent implements OnInit {
       author: 'Auteur',
       description: 'Description',
       price: 'Prix',
-      stockQuantity: 'Quantité en stock',
-      category: 'Catégorie',
-      publisher: 'Éditeur',
-      publicationYear: 'Année de publication',
+      stock: 'Stock',
+      imageBase64: 'Image',
       language: 'Langue',
-      pageCount: 'Nombre de pages',
-      imageUrl: 'URL de l\'image'
+      category: 'Catégorie'
     };
     return labels[fieldName] || fieldName;
   }
@@ -226,5 +235,28 @@ export class BookFormComponent implements OnInit {
 
   getMinYear(): number {
     return 1000;
+  }
+
+  onImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      if (this.imageService.validateImageFile(file)) {
+        this.selectedImage = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.imagePreview = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.notificationService.error('Format d\'image non valide. Utilisez JPG, PNG, GIF ou WebP (max 5MB)');
+        event.target.value = '';
+      }
+    }
+  }
+
+  removeImage() {
+    this.selectedImage = null;
+    this.imagePreview = null;
+    this.bookForm.patchValue({ imageBase64: '' });
   }
 }

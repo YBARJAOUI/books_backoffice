@@ -1,0 +1,46 @@
+.pack-list-container {
+  .page-header {
+    color: #495057;
+    font-weight: 600;
+    i {
+      color: #667eea;
+    }
+  }
+
+  .pack-card {
+    height: 100%;
+    transition: transform 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-img-top {
+      object-fit: cover;
+      height: 200px;
+    }
+
+    .pack-badges {
+      z-index: 1;
+    }
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+  }
+
+  .modal {
+    background-color: rgba(0,0,0,0.5);
+    
+    &.show {
+      display: block !important;
+    }
+  }
+
+  .required::after {
+    content: ' *';
+    color: #dc3545;
+  }
+}

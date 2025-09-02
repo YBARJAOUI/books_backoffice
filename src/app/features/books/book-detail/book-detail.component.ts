@@ -67,14 +67,14 @@ export class BookDetailComponent implements OnInit {
     }
   }
 
-  toggleFeatured() {
+  toggleAvailability() {
     if (!this.book) return;
     
-    this.bookService.toggleFeatured(this.book.id!).subscribe({
+    this.bookService.toggleAvailability(this.book.id!).subscribe({
       next: (updatedBook) => {
         this.book = updatedBook;
-        const action = updatedBook.isFeatured ? 'ajouté aux' : 'retiré des';
-        this.notificationService.success(`Livre ${action} favoris`);
+        const status = updatedBook.isAvailable ? 'disponible' : 'indisponible';
+        this.notificationService.success(`Livre marqué comme ${status}`);
       },
       error: (error) => {
         console.error('Erreur lors de la mise à jour:', error);
@@ -87,26 +87,29 @@ export class BookDetailComponent implements OnInit {
     this.router.navigate(['/books']);
   }
 
-  getStockSeverity(stock: number): string {
-    if (stock === 0) return 'danger';
-    if (stock <= 10) return 'warning';
-    if (stock <= 50) return 'info';
-    return 'success';
+  getAvailabilitySeverity(isAvailable: boolean): string {
+    return isAvailable ? 'success' : 'danger';
   }
 
-  getStatusClass(isActive: boolean): string {
-    return isActive ? 'text-success' : 'text-danger';
+  getImageUrl(imagePath: string): string {
+    return this.bookService.getImageUrl(imagePath);
   }
 
   getLanguageLabel(language: string): string {
-    const languageLabels: { [key: string]: string } = {
-      'fr': 'Français',
-      'en': 'Anglais',
-      'es': 'Espagnol',
-      'de': 'Allemand',
-      'it': 'Italien',
-      'other': 'Autre'
+    const labels: { [key: string]: string } = {
+      'francais': 'Français',
+      'anglais': 'Anglais',
+      'arabe': 'Arabe'
     };
-    return languageLabels[language] || language;
+    return labels[language] || language;
+  }
+
+  getLanguageBadgeClass(language: string): string {
+    const classes: { [key: string]: string } = {
+      'francais': 'bg-primary',
+      'anglais': 'bg-success', 
+      'arabe': 'bg-warning text-dark'
+    };
+    return classes[language] || 'bg-secondary';
   }
 }

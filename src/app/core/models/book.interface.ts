@@ -5,15 +5,11 @@ export interface Book {
   author: string;
   description?: string;
   price: number;
-  stockQuantity: number;
-  category?: string;
-  publisher?: string;
-  publicationYear?: number;
-  language?: string;
-  pageCount?: number;
-  imageUrl?: string;
-  isActive?: boolean;
-  isFeatured?: boolean;
+  imageBase64?: string;
+  isAvailable?: boolean;
+  language: 'francais' | 'arabe' | 'anglais';
+  category: string;
+  stock?: number;
   createdAt?: string;
   updatedAt?: string;
 }

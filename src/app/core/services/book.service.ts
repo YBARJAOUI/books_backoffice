@@ -53,11 +53,6 @@ export class BookService {
     return this.apiService.get<Book[]>(`${this.endpoint}/search`, params);
   }
 
-  // Récupérer les livres par catégorie
-  getBooksByCategory(category: string): Observable<Book[]> {
-    return this.apiService.get<Book[]>(`${this.endpoint}/category/${category}`);
-  }
-
   // Récupérer les livres en vedette
   getFeaturedBooks(): Observable<Book[]> {
     return this.apiService.get<Book[]>(`${this.endpoint}/featured`);
@@ -80,10 +75,6 @@ export class BookService {
     return this.apiService.put<Book>(`${this.endpoint}/${id}/stock`, params);
   }
 
-  // Toggle le statut featured
-  toggleFeatured(id: number): Observable<Book> {
-    return this.apiService.put<Book>(`${this.endpoint}/${id}/toggle-featured`, {});
-  }
 
   // Récupérer les livres par plage de prix
   getBooksByPriceRange(minPrice: number, maxPrice: number): Observable<Book[]> {
@@ -101,5 +92,26 @@ export class BookService {
       params.excludeId = excludeId.toString();
     }
     return this.apiService.get<boolean>(`${this.endpoint}/check-isbn`, params);
+  }
+
+  // Toggle la disponibilité d'un livre
+  toggleAvailability(id: number): Observable<Book> {
+    return this.apiService.put<Book>(`${this.endpoint}/${id}/toggle-availability`, {});
+  }
+
+  // Méthode getAllBooks (alias pour getBooks)
+  getAllBooks(options: { page: number; size: number }): Observable<PagedResponse<Book>> {
+    return this.getBooks(options.page, options.size);
+  }
+
+  // Générer l'URL complète pour les images
+  getImageUrl(imagePath: string | undefined): string {
+    if (!imagePath) {
+      return '/assets/images/book-placeholder.jpg';
+    }
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    return `/api/images/${imagePath}`;
   }
 }

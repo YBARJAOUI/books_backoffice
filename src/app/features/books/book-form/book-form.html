@@ -82,15 +82,19 @@
 
             <!-- Catégorie -->
             <div class="col-md-6 mb-3">
-              <label class="form-label">Catégorie</label>
+              <label class="form-label required">Catégorie</label>
               <select 
                 class="form-select"
+                [class.is-invalid]="isFieldInvalid('category')"
                 formControlName="category">
                 <option value="">Sélectionner une catégorie</option>
                 <option *ngFor="let category of categoryOptions" [value]="category">
                   {{ category }}
                 </option>
               </select>
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('category')">
+                {{ getFieldError('category') }}
+              </div>
             </div>
           </div>
 
@@ -135,12 +139,12 @@
               <input 
                 type="number" 
                 class="form-control"
-                [class.is-invalid]="isFieldInvalid('stockQuantity')"
-                formControlName="stockQuantity"
+                [class.is-invalid]="isFieldInvalid('stock')"
+                formControlName="stock"
                 min="0"
                 placeholder="0">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('stockQuantity')">
-                {{ getFieldError('stockQuantity') }}
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('stock')">
+                {{ getFieldError('stock') }}
               </div>
             </div>
 
@@ -164,66 +168,65 @@
           </h5>
           
           <div class="row">
-            <!-- Année de publication -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Année de publication</label>
-              <input 
-                type="number" 
-                class="form-control"
-                [class.is-invalid]="isFieldInvalid('publicationYear')"
-                formControlName="publicationYear"
-                [min]="getMinYear()"
-                [max]="getCurrentYear()"
-                placeholder="2024">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('publicationYear')">
-                {{ getFieldError('publicationYear') }}
-              </div>
-            </div>
-
             <!-- Langue -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Langue</label>
+            <div class="col-md-6 mb-3">
+              <label class="form-label required">Langue</label>
               <select 
                 class="form-select"
+                [class.is-invalid]="isFieldInvalid('language')"
                 formControlName="language">
                 <option *ngFor="let lang of languageOptions" [value]="lang.value">
                   {{ lang.label }}
                 </option>
               </select>
-            </div>
-
-            <!-- Nombre de pages -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Nombre de pages</label>
-              <input 
-                type="number" 
-                class="form-control"
-                [class.is-invalid]="isFieldInvalid('pageCount')"
-                formControlName="pageCount"
-                min="1"
-                placeholder="0">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('pageCount')">
-                {{ getFieldError('pageCount') }}
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('language')">
+                {{ getFieldError('language') }}
               </div>
-            </div>
-
-            <!-- Image URL -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label">URL de l'image</label>
-              <input 
-                type="url" 
-                class="form-control"
-                formControlName="imageUrl"
-                placeholder="https://...">
             </div>
           </div>
         </div>
 
-        <!-- Options -->
+        <!-- Image du livre -->
+        <div class="form-section">
+          <h5 class="section-title">
+            <i class="pi pi-image me-2"></i>
+            Image du livre
+          </h5>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Sélectionner une image</label>
+              <input 
+                type="file" 
+                class="form-control"
+                accept="image/*"
+                (change)="onImageSelected($event)">
+              <small class="form-text text-muted">
+                Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
+              </small>
+            </div>
+            
+            <div class="col-md-6 mb-3" *ngIf="imagePreview">
+              <label class="form-label">Aperçu</label>
+              <div class="image-preview">
+                <img [src]="imagePreview" alt="Aperçu" class="preview-image">
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-danger mt-2"
+                  (click)="removeImage()">
+                  <i class="pi pi-trash me-1"></i>
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statut -->
         <div class="form-section">
           <h5 class="section-title">
             <i class="pi pi-cog me-2"></i>
-            Options
+            Statut
           </h5>
           
           <div class="row">
@@ -232,23 +235,10 @@
                 <input 
                   class="form-check-input" 
                   type="checkbox" 
-                  formControlName="isActive"
-                  id="isActive">
-                <label class="form-check-label" for="isActive">
-                  Livre actif
-                </label>
-              </div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <div class="form-check form-switch">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  formControlName="isFeatured"
-                  id="isFeatured">
-                <label class="form-check-label" for="isFeatured">
-                  Livre en vedette
+                  formControlName="isAvailable"
+                  id="isAvailable">
+                <label class="form-check-label" for="isAvailable">
+                  Livre disponible à la vente
                 </label>
               </div>
             </div>

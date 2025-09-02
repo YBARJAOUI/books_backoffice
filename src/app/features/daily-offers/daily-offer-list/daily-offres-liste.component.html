@@ -1,0 +1,197 @@
+
+<div class="daily-offer-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-header">
+      <i class="pi pi-star-fill me-2"></i>
+      Daily Offers Management
+    </h2>
+    <button class="btn btn-primary" (click)="showNewOfferDialog()">
+      <i class="pi pi-plus me-2"></i>
+      New Offer
+    </button>
+  </div>
+
+  <!-- Offers Grid -->
+  <div class="row">
+    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let offer of offers">
+      <div class="custom-card offer-card" [class.expired]="!isOfferValid(offer)">
+        <div class="card-header position-relative">
+          <img [src]="offer.imageUrl || 'assets/images/offer-placeholder.png'" 
+               class="card-img-top" 
+               [alt]="offer.title"
+               style="height: 180px; object-fit: cover;">
+          <div class="offer-discount position-absolute top-0 start-0 p-2">
+            <span class="badge bg-danger fs-6">
+              -{{ offer.discountPercentage }}%
+            </span>
+          </div>
+          <div class="offer-status position-absolute top-0 end-0 p-2">
+            <span class="badge" [class]="isOfferValid(offer) ? 'bg-success' : 'bg-secondary'">
+              {{ isOfferValid(offer) ? 'Active' : 'Expired' }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ offer.title }}</h5>
+          <p class="card-text text-muted small">{{ offer.description }}</p>
+          
+          <div class="price-section mb-3">
+            <span class="original-price text-muted text-decoration-line-through">
+              {{ offer.originalPrice | currency:'EUR' }}
+            </span>
+            <strong class="offer-price text-danger ms-2 fs-5">
+              {{ offer.offerPrice | currency:'EUR' }}
+            </strong>
+          </div>
+
+          <div class="mb-2">
+            <small class="text-muted">
+              <i class="pi pi-calendar me-1"></i>
+              {{ offer.startDate | date:'shortDate' }} - {{ offer.endDate | date:'shortDate' }}
+            </small>
+          </div>
+
+          <div class="mb-2" *ngIf="offer.limitQuantity">
+            <div class="progress" style="height: 20px;">
+              <div class="progress-bar" 
+                   [style.width.%]="(offer.soldQuantity! / offer.limitQuantity) * 100"
+                   [class]="offer.soldQuantity! >= offer.limitQuantity ? 'bg-danger' : 'bg-success'">
+                {{ offer.soldQuantity }}/{{ offer.limitQuantity }} sold
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-fill" (click)="editOffer(offer)">
+              <i class="pi pi-pencil"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteOffer(offer)">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="col-12" *ngIf="offers.length === 0 && !loading">
+      <div class="custom-card text-center py-5">
+        <i class="pi pi-star empty-icon"></i>
+        <h5>No Offers Found</h5>
+        <p class="text-muted">Create your first daily offer</p>
+        <button class="btn btn-primary" (click)="showNewOfferDialog()">
+          <i class="pi pi-plus me-2"></i>
+          Create Offer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2">Loading offers...</p>
+  </div>
+</div>
+
+<!-- Offer Dialog -->
+<div class="modal" [class.show]="showDialog" [style.display]="showDialog ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEditMode ? 'Edit Offer' : 'New Offer' }}</h5>
+        <button type="button" class="btn-close" (click)="showDialog = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Offer Type</label>
+          <select class="form-select" [(ngModel)]="offerType" (change)="onOfferTypeChange()">
+            <option value="custom">Custom Offer</option>
+            <option value="book">Book Offer</option>
+            <option value="pack">Pack Offer</option>
+          </select>
+        </div>
+
+        <div class="mb-3" *ngIf="offerType === 'book'">
+          <label class="form-label">Select Book</label>
+          <select class="form-select" [(ngModel)]="currentOffer.bookId">
+            <option *ngFor="let book of books" [value]="book.id">
+              {{ book.title }} - {{ book.price | currency:'EUR' }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-3" *ngIf="offerType === 'pack'">
+          <label class="form-label">Select Pack</label>
+          <select class="form-select" [(ngModel)]="currentOffer.packId">
+            <option *ngFor="let pack of packs" [value]="pack.id">
+              {{ pack.name }} - {{ pack.price | currency:'EUR' }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label required">Title</label>
+          <input type="text" class="form-control" [(ngModel)]="currentOffer.title">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label required">Description</label>
+          <textarea class="form-control" [(ngModel)]="currentOffer.description" rows="3"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label required">Original Price (€)</label>
+            <input type="number" class="form-control" [(ngModel)]="currentOffer.originalPrice" step="0.01" min="0">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label required">Offer Price (€)</label>
+            <input type="number" class="form-control" [(ngModel)]="currentOffer.offerPrice" step="0.01" min="0">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Discount</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [value]="calculateDiscountPercentage()" readonly>
+              <span class="input-group-text">%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">Start Date</label>
+            <input type="date" class="form-control" [(ngModel)]="currentOffer.startDate">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label required">End Date</label>
+            <input type="date" class="form-control" [(ngModel)]="currentOffer.endDate">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Limit Quantity</label>
+            <input type="number" class="form-control" [(ngModel)]="currentOffer.limitQuantity" min="0">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Image URL</label>
+            <input type="text" class="form-control" [(ngModel)]="currentOffer.imageUrl">
+          </div>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" [(ngModel)]="currentOffer.isActive" id="offerActive">
+          <label class="form-check-label" for="offerActive">Active</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showDialog = false">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveOffer()">
+          {{ isEditMode ? 'Update' : 'Create' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
